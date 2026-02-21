@@ -280,7 +280,7 @@
         showLoading();
         console.log('开始调用智谱AI生成文案...');
 
-        fetch('https://fengteng405.vercel.app/api/copywriting', {
+        fetch('https://fengteng4055.vercel.app/api/copywriting', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -472,7 +472,7 @@
 
         showLoading();
 
-        fetch('https://fengteng405.vercel.app/api/poster', {
+        fetch('https://fengteng4055.vercel.app/api/poster', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
