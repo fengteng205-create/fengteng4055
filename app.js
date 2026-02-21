@@ -128,6 +128,14 @@
     ];
 
     function init() {
+        const savedSchoolName = localStorage.getItem('schoolName');
+        const savedSchoolAdvantage = localStorage.getItem('schoolAdvantage');
+        const savedTopicDirection = localStorage.getItem('topicDirection');
+        
+        if (savedSchoolName) document.getElementById('schoolName').value = savedSchoolName;
+        if (savedSchoolAdvantage) document.getElementById('schoolAdvantage').value = savedSchoolAdvantage;
+        if (savedTopicDirection) document.getElementById('topicDirection').value = savedTopicDirection;
+        
         bindEvents();
         updateTabIndicator();
     }
@@ -139,6 +147,10 @@
 
         document.querySelectorAll('.result-tab').forEach(tab => {
             tab.addEventListener('click', handleResultTabSwitch);
+        });
+
+        document.querySelectorAll('.platform-tab').forEach(tab => {
+            tab.addEventListener('click', handlePlatformTabSwitch);
         });
 
         document.getElementById('generateCopywriting').addEventListener('click', generateCopywriting);
@@ -209,6 +221,22 @@
         document.getElementById(`result-${tab}`).classList.add('active');
     }
 
+    function handlePlatformTabSwitch(e) {
+        const platform = e.currentTarget.dataset.platform;
+
+        document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+
+        if (state.generatedCopywriting) {
+            updatePlatformContent(state.generatedCopywriting, platform);
+            state.currentPlatform = platform;
+
+            document.querySelectorAll('.title-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.platform === platform);
+            });
+        }
+    }
+
     function showLoading() {
         document.getElementById('loadingOverlay').style.display = 'flex';
     }
@@ -230,6 +258,7 @@
         const schoolName = document.getElementById('schoolName').value.trim();
         const topicType = document.getElementById('topicType').value;
         const schoolAdvantage = document.getElementById('schoolAdvantage').value.trim();
+        const topicDirection = document.getElementById('topicDirection').value.trim();
 
         if (!schoolName) {
             showToast('请输入学校名称');
@@ -244,6 +273,10 @@
             return;
         }
 
+        localStorage.setItem('schoolName', schoolName);
+        localStorage.setItem('schoolAdvantage', schoolAdvantage);
+        localStorage.setItem('topicDirection', topicDirection);
+
         showLoading();
         console.log('开始调用智谱AI生成文案...');
 
@@ -255,7 +288,8 @@
             body: JSON.stringify({
                 schoolName: schoolName,
                 topicType: topicType,
-                schoolAdvantage: schoolAdvantage
+                schoolAdvantage: schoolAdvantage,
+                topicDirection: topicDirection
             })
         })
         .then(response => response.json())
@@ -265,22 +299,13 @@
             }
             console.log('AI返回数据:', data);
             
-            const result = {
-                titles: data.titles || [],
-                openingHook: data.openingHook || '',
-                scriptContent: data.scriptContent || '',
-                endingHook: data.endingHook || '',
-                tags: data.tags || []
-            };
-
-            state.generatedCopywriting = result;
-            displayCopywritingResult(result);
+            state.generatedCopywriting = data;
+            displayCopywritingResult(data);
             hideLoading();
             showToast('文案生成成功！');
         })
         .catch(error => {
             console.error('生成文案时出错:', error);
-            console.error('错误详情:', error.response?.data);
             hideLoading();
             let errorMsg = 'AI生成失败，请重试';
             if (error.response?.data?.error) {
@@ -292,35 +317,97 @@
         });
     }
 
-    function displayCopywritingResult(result) {
+    function displayCopywritingResult(data) {
+        const douyin = data.douyin || {};
+        const xiaohongshu = data.xiaohongshu || {};
+        const shipinhao = data.shipinhao || {};
+
+        state.currentPlatform = 'douyin';
+
         const titleList = document.getElementById('titleList');
-        titleList.innerHTML = result.titles.map((title, index) => `
-            <div class="title-item ${index === 0 ? 'active' : ''}" data-index="${index}">
-                <span class="title-item-number">${index + 1}</span>
-                <span class="title-item-text">${title}</span>
+        titleList.innerHTML = `
+            <div class="title-item active" data-platform="douyin">
+                <span class="title-item-number">抖</span>
+                <span class="title-item-text">${douyin.title || ''}</span>
+                <button class="btn-copy title-copy-btn" data-title="douyin">复制</button>
             </div>
-        `).join('');
+            <div class="title-item" data-platform="xiaohongshu">
+                <span class="title-item-number">红</span>
+                <span class="title-item-text">${xiaohongshu.title || ''}</span>
+                <button class="btn-copy title-copy-btn" data-title="xiaohongshu">复制</button>
+            </div>
+            <div class="title-item" data-platform="shipinhao">
+                <span class="title-item-number">视</span>
+                <span class="title-item-text">${shipinhao.title || ''}</span>
+                <button class="btn-copy title-copy-btn" data-title="shipinhao">复制</button>
+            </div>
+        `;
 
-        const fullScript = `【开场】
-${result.openingHook}
+        document.querySelectorAll('.title-copy-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const platform = e.target.dataset.title;
+                const title = data[platform]?.title || '';
+                navigator.clipboard.writeText(title).then(() => showToast('标题已复制！'));
+            });
+        });
 
-【主体】
-${result.scriptContent}
+        document.querySelectorAll('.title-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.title-item').forEach(t => t.classList.remove('active'));
+                item.classList.add('active');
+                const platform = item.dataset.platform;
+                state.currentPlatform = platform;
+                updatePlatformContent(data, platform);
+            });
+        });
 
-【结尾】
-${result.endingHook}`;
+        updatePlatformContent(data, 'douyin');
 
-        document.getElementById('fullScript').textContent = fullScript;
-        
-        state.generatedCopywriting = {
-            ...result,
-            fullScript: fullScript
-        };
+        document.getElementById('friendCircleContent').innerHTML = formatContent(data.friendCircle);
+        document.getElementById('wechatContent').innerHTML = formatContent(data.wechat);
+        document.getElementById('communityContent').innerHTML = formatContent(data.community);
 
         const tagsContainer = document.getElementById('tagsContainer');
-        tagsContainer.innerHTML = result.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+        tagsContainer.innerHTML = (data.tags || []).map(tag => `
+            <span class="tag">${tag}</span>
+        `).join('');
 
         document.getElementById('copywritingResult').style.display = 'block';
+
+        document.getElementById('copyAllContent').onclick = () => {
+            const p = state.currentPlatform;
+            const content = `${data[p]?.openingHook || ''}\n\n${data[p]?.scriptContent || ''}\n\n${data[p]?.endingHook || ''}`;
+            navigator.clipboard.writeText(content).then(() => showToast('文案已复制！'));
+        };
+
+        document.getElementById('copyFriendCircle').onclick = () => {
+            navigator.clipboard.writeText(data.friendCircle || '').then(() => showToast('朋友圈文案已复制！'));
+        };
+
+        document.getElementById('copyWechat').onclick = () => {
+            navigator.clipboard.writeText(data.wechat || '').then(() => showToast('公众号文案已复制！'));
+        };
+
+        document.getElementById('copyCommunity').onclick = () => {
+            navigator.clipboard.writeText(data.community || '').then(() => showToast('社群文案已复制！'));
+        };
+
+        document.getElementById('copyAllTags').onclick = () => {
+            navigator.clipboard.writeText((data.tags || []).join(' ')).then(() => showToast('标签已复制！'));
+        };
+    }
+
+    function updatePlatformContent(data, platform) {
+        const p = data[platform] || {};
+        document.getElementById('openingHook').textContent = p.openingHook || '';
+        document.getElementById('scriptContent').textContent = p.scriptContent || '';
+        document.getElementById('endingHook').textContent = p.endingHook || '';
+    }
+
+    function formatContent(text) {
+        if (!text) return '';
+        return text.split('\n').map(line => line.trim() ? `<p>${line}</p>` : '').join('');
     }
 
     function applyToPoster() {

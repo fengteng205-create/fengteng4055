@@ -396,7 +396,43 @@ body {
     gap: 12px;
 }
 
+.platform-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 8px;
+    background: var(--bg-dark);
+    border-radius: var(--radius-btn);
+}
+
+.platform-tab {
+    flex: 1;
+    padding: 10px 16px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-btn);
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.platform-tab:hover {
+    border-color: var(--primary);
+    color: var(--text-primary);
+}
+
+.platform-tab.active {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-color: transparent;
+    color: white;
+}
+
 .title-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     background: var(--bg-dark);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-btn);
@@ -419,18 +455,48 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    background: var(--primary);
-    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius: 6px;
     font-size: 12px;
-    font-weight: 600;
-    margin-right: 12px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
 }
 
 .title-item-text {
+    flex: 1;
     font-size: 15px;
     line-height: 1.5;
+    color: var(--text-primary);
+}
+
+.title-copy-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.tags-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.content-block {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-btn);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.content-block p {
+    margin-bottom: 12px;
+    line-height: 1.8;
+}
 }
 
 .content-block {

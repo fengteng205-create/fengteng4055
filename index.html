@@ -91,14 +91,21 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group full-width">
-                            <label class="form-label">
-                                <span class="label-icon">💪</span>
-                                学校优势
-                                <span class="required">*</span>
-                            </label>
-                            <textarea class="form-textarea" id="schoolAdvantage" placeholder="请输入学校优势，例如：师资力量强、小班教学、升学率高、个性化辅导..."></textarea>
-                        </div>
+                        <div class="form-group">
+                                <label class="form-label">
+                                    <span class="label-icon">💪</span>
+                                    学校优势
+                                    <span class="required">*</span>
+                                </label>
+                                <textarea class="form-textarea" id="schoolAdvantage" placeholder="请输入学校优势，例如：师资力量强、小班教学、升学率高、个性化辅导..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <span class="label-icon">📝</span>
+                                    选题方向
+                                </label>
+                                <input type="text" class="form-input" id="topicDirection" placeholder="例如：针对孩子手机成瘾、厌学、拖拉等具体问题">
+                            </div>
                         <div class="form-actions">
                             <button class="btn btn-primary" id="generateCopywriting">
                                 <span class="btn-icon">
@@ -115,43 +122,59 @@
                         <div class="result-header">
                             <h3 class="result-title">生成结果</h3>
                             <div class="result-tabs">
-                                <button class="result-tab active" data-result-tab="title">标题</button>
-                                <button class="result-tab" data-result-tab="content">文案内容</button>
+                                <button class="result-tab active" data-result-tab="title">短视频文案</button>
+                                <button class="result-tab" data-result-tab="content">朋友圈文案</button>
+                                <button class="result-tab" data-result-tab="wechat">公众号文案</button>
+                                <button class="result-tab" data-result-tab="community">社群文案</button>
                                 <button class="result-tab" data-result-tab="tags">关键词标签</button>
                             </div>
                         </div>
                         <div class="result-content">
                             <div class="result-panel active" id="result-title">
+                                <div class="platform-tabs">
+                                    <button class="platform-tab active" data-platform="douyin">抖音</button>
+                                    <button class="platform-tab" data-platform="xiaohongshu">小红书</button>
+                                    <button class="platform-tab" data-platform="shipinhao">视频号</button>
+                                </div>
                                 <div class="title-list" id="titleList"></div>
-                                <button class="btn-copy-all" id="copyAllTitles">一键复制全部标题</button>
+                                <div class="content-section">
+                                    <h4 class="content-label"><span class="label-badge">开场</span></h4>
+                                    <div class="content-text" id="openingHook"></div>
+                                    <button class="btn-copy" data-copy="openingHook">复制</button>
+                                </div>
+                                <div class="content-section">
+                                    <h4 class="content-label"><span class="label-badge">主体</span></h4>
+                                    <div class="content-text" id="scriptContent"></div>
+                                    <button class="btn-copy" data-copy="scriptContent">复制</button>
+                                </div>
+                                <div class="content-section">
+                                    <h4 class="content-label"><span class="label-badge">结尾</span></h4>
+                                    <div class="content-text" id="endingHook"></div>
+                                    <button class="btn-copy" data-copy="endingHook">复制</button>
+                                </div>
+                                <button class="btn-copy-all" id="copyAllContent">一键复制全部文案</button>
                             </div>
                             <div class="result-panel" id="result-content">
-                                <div class="content-block">
-                                    <div class="content-section full-script-section">
-                                        <div class="content-header">
-                                            <h4 class="content-label">
-                                                <span class="label-badge">完整口播文案</span>
-                                            </h4>
-                                            <button class="btn-copy btn-copy-full" data-copy="fullScript">一键复制全部</button>
-                                        </div>
-                                        <div class="content-text full-script" id="fullScript"></div>
-                                    </div>
-                                </div>
+                                <div class="content-block" id="friendCircleContent"></div>
+                                <button class="btn-copy-all" id="copyFriendCircle">一键复制朋友圈文案</button>
+                            </div>
+                            <div class="result-panel" id="result-wechat">
+                                <div class="content-block" id="wechatContent"></div>
+                                <button class="btn-copy-all" id="copyWechat">一键复制公众号文案</button>
+                            </div>
+                            <div class="result-panel" id="result-community">
+                                <div class="content-block" id="communityContent"></div>
+                                <button class="btn-copy-all" id="copyCommunity">一键复制社群文案</button>
                             </div>
                             <div class="result-panel" id="result-tags">
+                                <div class="tags-header">
+                                    <h4 class="content-label"><span class="label-badge">关键词标签</span></h4>
+                                    <button class="btn-copy" id="copyAllTags">一键复制全部</button>
+                                </div>
                                 <div class="tags-container" id="tagsContainer"></div>
                             </div>
                         </div>
                         <div class="result-actions">
-                            <button class="btn btn-primary" id="copyAllContent">
-                                <span class="btn-icon">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="9" y="9" width="13" height="13" rx="2"/>
-                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                                    </svg>
-                                </span>
-                                一键复制全部文案
-                            </button>
                             <button class="btn btn-secondary" id="applyToPoster">
                                 <span class="btn-icon">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
